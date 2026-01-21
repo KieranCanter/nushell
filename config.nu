@@ -46,8 +46,8 @@ $env.config.table.header_on_separator = true
 $env.config.table.missing_value_symbol = '×'
 $env.config.table.trim = { methodology: "truncating", truncating_suffix: "…" }
 
-$env.config.datetime_format.table = "%H:%M:%S %m/%d/%y"
-$env.config.datetime_format.normal = "%H:%M:%S %m/%d/%y"
+$env.config.datetime_format.table = "%m/%d/%y %H:%M:%S"
+$env.config.datetime_format.normal = "%m/%d/%y %H:%M:%S"
 
 $env.config.filesize.unit = "binary"
 
