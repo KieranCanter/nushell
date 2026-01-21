@@ -280,7 +280,7 @@ def make_time_icon []: nothing -> closure {
 
 def make_time [budget: int, icon: closure, color: closure]: nothing -> string {
   let now = date now
-  $"(do $icon $now)($now | format date '%H:%M:%S %m/%d/%y')" | add_color (do $color $now)
+  $"(do $icon $now)($now | format date '%b %d %H:%M:%S')" | add_color (do $color $now)
 }
 
 export def prompt_part_cmdduration [
