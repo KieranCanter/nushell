@@ -1,0 +1,4 @@
+history.*
+*.sqlite
+*.sqlite3
+plugin.msgpackz

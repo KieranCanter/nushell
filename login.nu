@@ -1,0 +1,8 @@
+$env.CONFIG_HOME = '/Users/kicanter/.config'
+$env.FZF_DEFAULT_COMMAND = 'rg --files --hidden'
+$env.HOMEBREW_CELLAR = '/opt/homebrew/Cellar'
+$env.HOMEBREW_PREFIX = '/opt/homebrew'
+$env.HOMEBREW_REPOSITORY = '/opt/homebrew'
+$env.INFOPATH = '/opt/homebrew/share/info:'
+$env.SSH_AUTH_SOCK = '/private/tmp/com.apple.launchd.d5FkR0tNV4/Listeners'
+$env._ = '/opt/homebrew/bin/nu'
