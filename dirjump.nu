@@ -18,7 +18,7 @@ $env.dirjump = {
       (
         $jump_data.before == '' or
         $jump_data.after == $env.PWD or
-        $jump_data.after == $nu.home-path
+        $jump_data.after == $env.HOME
       )
     },
 
@@ -47,7 +47,7 @@ $env.dirjump = {
 if not ($env.dirjump.db_path | path exists) {
   # Create a database file (couldn't find a better way to do it with Nu itself)
   [ { a: 1 } ] | into sqlite $env.dirjump.db_path --table-name tmp
-  let db = nu-open $env.dirjump.db_path
+  let db = open $env.dirjump.db_path
   $db | query db "drop table tmp"
 
   # Creating tables is modeled after how built-in SQLite history table is created:
@@ -85,7 +85,7 @@ def --env register_jump [before, after]: nothing -> nothing {
     before: $before,
     kind: $kind,
   }
-  nu-open $env.dirjump.db_path |
+  open $env.dirjump.db_path |
     query db "insert into jumps values(null, :time, :session, :after, :before, :kind)" --params $params
 
   $env.dirjump.next_jump_kind = 'outside'
@@ -124,7 +124,7 @@ def rank_column [col_name: string]: list<any> -> list<int> {
 
 # Smart completion based on features of jump history
 def dirjump_completer [] {
-  let db = nu-open $env.dirjump.db_path
+  let db = open $env.dirjump.db_path
   let bookmarks = $db | query db "select mark, path from bookmarks"
   let opts = $env.dirjump.completions
   let coefs = $opts.coefs
@@ -167,7 +167,7 @@ def dirjump_completer [] {
     | insert short_path {
       |row|
       if ($row.is_subdir) { return $row.rel_path }
-      try { '~' | path join ($row.after | path relative-to $nu.home-path) } catch { $row.after }
+      try { '~' | path join ($row.after | path relative-to $env.HOME) } catch { $row.after }
     }
     | insert value { |row| if ($row.is_bookmark) {$row.mark} else {$row.short_path}}
     | insert description { |row| if ($row.is_bookmark) {$row.short_path} else {''}}
@@ -192,7 +192,7 @@ def --env dj [
   --list: string,
   --prune: duration
 ]: nothing -> any {
-  let db = nu-open $env.dirjump.db_path
+  let db = open $env.dirjump.db_path
 
   # Mark current working directory
   if ($mark | is-not-empty) {
@@ -218,7 +218,7 @@ def --env dj [
   # Prune jumps that are older than timeout
   if ($prune | is-not-empty) {
     let params = { cutoff: ((date now) - $prune) }
-    let db = nu-open $env.dirjump.db_path
+    let db = open $env.dirjump.db_path
     let n_pruned = $db
       | query db "select count() as n from jumps where time <= :cutoff" --params $params
       | get n.0

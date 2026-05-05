@@ -1,41 +1,67 @@
-$env.config.show_banner = false
+$env.XDG_SESSION_TYPE = "wayland"
 
-# Add to path early, (belongs in login.nu but login.nu runs after config.nu, so it needs to be here
-# to be able to run any binaries in config.nu)
-$env.PATH = ($env.PATH | append [
-"/Users/kicanter/.pyenv/shims"
-"/Users/kicanter/.local/share/mise/installs/node/18.20.2/bin"
-"/Users/kicanter/.local/share/mise/installs/python/3.12.9/bin"
-"/Users/kicanter/.local/share/mise/installs/python/3.11.11/bin"
-"/Users/kicanter/.local/share/mise/installs/python/3.10.16/bin"
-"/Users/kicanter/.local/share/mise/installs/python/3.9.21/bin"
-"/Users/kicanter/.local/share/mise/installs/python/3.8.20/bin"
-"/Users/kicanter/.local/bin/"
-"/opt/homebrew/bin"
-"/opt/homebrew/sbin"
-"/Users/kicanter/.cargo/bin"
+# Auto-start hyprland on tty1 login
+if (tty) == "/dev/tty1" {
+    start-hyprland
+}
+
+$env.LANG = "en_US.UTF-8"
+$env.LC_ALL = "en_US.UTF-8"
+$env.LESS = "-RF"
+$env.LESSCHARSET = "utf-8"
+
+$env.config.show_banner = false
+$env.config.use_kitty_protocol = true
+
+$env.PATH ++= [
 "/usr/bin"
 "/usr/sbin"
 "/usr/local/bin"
 "/bin"
 "/sbin"
-"/Applications/Ghostty.app/Contents/MacOS"
-"/Users/kicanter/.toolbox/bin"
-])
+($env.HOME | path join ".local/bin")
+($env.HOME | path join ".pyenv/bin")
+($env.HOME | path join ".pyenv/shims")
+]
 
 # Set Neovim as default text editor
 $env.config.buffer_editor = "nvim"
 $env.EDITOR = $env.config.buffer_editor
 $env.VISUAL = $env.EDITOR
 
-# Don't clobber Mac's `open` command
-alias nu-open = open
-alias open = ^open
-
-# Aliases from old zsh
-alias rsync-image = rsync -avczLP --include='image_files/MBR_EMMC' --include='image_files/boot.img' --include='image_files/system.img' --include='image_files/vendor.img' --include='image_files/userdata.img' --include='image_files/bl2.img' --include='image_files/tee.img' --include='image_files/u-boot-mtk.bin' --include='image_files/u-boot-mtk.bin.sign' --include='image_files/spmfw.img' --include='image_files/sspm-fit.img' --include='image_files/lk.bin' --include='image_files/unsigned' --include='image_files/signed' --include='image_files/cache.img' --include='flashaddon.py' --include='flashimage.py' --include='flashtools.py' --include='flashtelemetry.py' --include='get_logs.sh' --include='platform-tools' --include='*/' --exclude='*' --delete
-alias flash-image = python3 flashimage.py --toolsdir=/Users/kicanter/.toolbox/bin --aserial=G4N33M03351600JM --fserial=G4N33M03351600JM
-alias useful-commands = nvim /Volumes/workplace/useful-commands.md
+$env.config.keybindings ++= [
+    # Autocomplete history hint with ctrl-y
+    {
+        name: autocomplete_history_hint
+        modifier: control
+        keycode: char_y
+        mode: [emacs, vi_normal, vi_insert]
+        event: { send: historyhintcomplete }
+    }
+    # Autocomplete by word with ctrl+l and ctrl+h
+    {
+        name: autocomplete_history_hint_word
+        modifier: control
+        keycode: char_l
+        mode: [emacs, vi_normal, vi_insert]
+        event: { send: historyhintwordcomplete }
+    }
+    {
+        name: backspace_word
+        modifier: control
+        keycode: char_h
+        mode: [emacs, vi_normal, vi_insert]
+        event: { edit: backspaceword }
+    }
+    # Unbind ctrl+d for exiting shell
+    {
+        name: unbind_quit_shell
+        modifier: control
+        keycode: char_d
+        mode: [emacs, vi_normal, vi_insert]
+        event: null
+    }
+]
 
 # General =====================================================================
 $env.config.footer_mode = "auto"
@@ -99,17 +125,17 @@ $env.config.menus ++= [{
 
 # Environment variables =======================================================
 # XDG_***
-$env.XDG_CONFIG_HOME = $nu.home-path | path join '.config'
-$env.XDG_DATA_HOME = $nu.home-path | path join '.local' 'share'
-$env.XDG_STATE_HOME = $nu.home-path | path join '.local' 'state'
-$env.XDG_CACHE_HOME = $nu.home-path | path join '.cache'
+$env.XDG_CONFIG_HOME = $env.HOME | path join '.config'
+$env.XDG_DATA_HOME = $env.HOME | path join '.local' 'share'
+$env.XDG_STATE_HOME = $env.HOME | path join '.local' 'state'
+$env.XDG_CACHE_HOME = $env.HOME | path join '.cache'
 
 # Pager
 $env.MANPAGER = 'nvim +Man!'
 $env.PAGER = 'nvim +Man!'
 
 # `rg` config
-$env.RIPGREP_CONFIG_PATH = $nu.home-path | path join '.config/ripgrep/.ripgreprc'
+$env.RIPGREP_CONFIG_PATH = $env.HOME | path join '.config/ripgrep/.ripgreprc'
 
 # Prompt ======================================================================
 plugin add nu_plugin_gstat
