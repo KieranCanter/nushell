@@ -195,6 +195,16 @@ def make_gitbranch [budget: int, icon: closure, color: any]: nothing -> string {
   let $gs = $env.prompt_latest_gstat
   if ($gs.stashes < 0) { return null }
 
+  let branch = if ((do { jj --ignore-working-copy root } | complete | get exit_code) == 0) {
+      jj log --revisions @ --no-graph --ignore-working-copy --color always --limit 1 --template r#'separate(" ",
+          change_id.shortest(8),
+          commit_id.shortest(8),
+          if(bookmarks, label("bookmark", bookmarks.map(|b| b.name()).join(" ")), label("bookmark", "(no bookmark)")),
+        )'# | str trim
+  } else {
+      $gs.branch
+  }
+
   let behind = if ($gs.behind > 0) { $"<($gs.behind)" } else { "" }
   let ahead = if ($gs.ahead > 0) { $">($gs.ahead)" } else { "" }
   let compare = (if ($behind != "" or $ahead != "") { " " } else { "" }) + $behind + $ahead
@@ -202,7 +212,7 @@ def make_gitbranch [budget: int, icon: closure, color: any]: nothing -> string {
   let gs_state = $gs | default 'None' state | get state
   let state = $repo_states | default "" $gs_state | get $gs_state
   let state = if ($state == "") {""} else {$" &($state)"}
-  $"(do $icon $gs)($gs.branch)($state)($compare)" | add_color (do $color $gs)
+  $"(do $icon $gs)($branch)($state)($compare)" | add_color (do $color $gs)
 }
 
 export def prompt_part_gitstatus [
