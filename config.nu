@@ -77,12 +77,14 @@ $env.config.datetime_format.normal = "%b %d %Y %H:%M:%S"
 
 $env.config.filesize.unit = "binary"
 
-$env.config.completions.algorithm = "fuzzy"
+$env.config.completions.algorithm = "prefix"
 $env.config.completions.case_sensitive = false
 $env.config.completions.external.max_results = 20
 
 $env.config.history.file_format = "sqlite"
 $env.config.history.isolation = true
+
+$env.config.use_kitty_protocol = true
 
 # Vi mode =====================================================================
 $env.config.edit_mode = 'vi'
